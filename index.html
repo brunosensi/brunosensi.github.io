@@ -2,69 +2,242 @@
 <html lang="pt-BR">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Sensi Free Fire iOS</title>
-
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Sensi Free Fire iOS</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-  <div class="wrap">
-    <section class="hero">
-      <span class="tag">📱 Feita para iPhone e iPad</span>
-      <h1>Sensi de Free Fire <span>para iOS</span></h1>
-      <p class="sub">Configuração pronta para mais precisão no tiro, mira estável e capa mais fácil. Só copiar e jogar.
-      </p>
-      <a class="btn" href="#planos">Ver planos</a>
-    </section>
 
-    <h2>O que você recebe</h2>
-    <div class="grid feat">
-      <div class="card"><b>🎯 Sensi completa</b><span>Geral, Red Dot, Mira 2x, 4x e AWM.</span></div>
-      <div class="card"><b>🖐️ Layout de botões</b><span>Posição ideal para 2, 3 ou 4 dedos.</span></div>
+    <div class="wrap">
 
-      <div class="card"><b>📩 Entrega rápida</b><span>Você recebe pelo Instagram com passo a passo.</span></div>
+        <!-- HERO -->
+        <section class="hero">
+            <span class="tag">📱 Feita para iPhone e iPad</span>
+            <h1>Sensi de Free Fire <span>para iOS</span></h1>
+            <p class="sub">
+                Configuração pronta para mais precisão no tiro, mira estável e capa mais fácil.
+                Só copiar e jogar.
+            </p>
+            <a class="btn" href="#planos">Ver planos</a>
+        </section>
+
+        <!-- O QUE VOCÊ RECEBE -->
+        <h2>O que você recebe</h2>
+        <div class="grid feat">
+            <div class="card">
+                <b>🎯 Sensi completa</b>
+                <span>Geral, Red Dot, Mira 2x, 4x e AWM.</span>
+            </div>
+            <div class="card">
+                <b>🖐️ Layout de botões</b>
+                <span>Posição ideal para 2, 3 ou 4 dedos.</span>
+            </div>
+            <div class="card">
+                <b>📩 Entrega rápida</b>
+                <span>Você recebe pelo Instagram com passo a passo.</span>
+            </div>
+        </div>
+
+        <!-- PLANOS -->
+        <h2 id="planos">Escolha seu plano</h2>
+        <div class="grid plans">
+
+            <div class="card">
+                <b>Sensi Básica</b>
+                <div class="price">R$ 4,50</div>
+                <ul>
+                    <li>Sensi geral + miras</li>
+                    <li>Passo a passo em imagens</li>
+                </ul>
+                <button class="btn btn-block" type="button" data-plano="Sensi Básica (R$ 4,50)">
+                    Comprar
+                </button>
+            </div>
+
+            <div class="card best">
+                <b>Sensi Completa ⭐</b>
+                <div class="price">R$ 10,50</div>
+                <ul>
+                    <li>Tudo do plano básico</li>
+                    <li>Layout de botões</li>
+                    <li>Ajustes de desempenho</li>
+                    <li>Suporte para dúvidas</li>
+                </ul>
+                <button class="btn btn-block" type="button" data-plano="Sensi Completa (R$ 10,50)">
+                    Comprar
+                </button>
+            </div>
+
+        </div>
+
+        <!-- COMO FUNCIONA -->
+        <h2>Como funciona</h2>
+        <div class="grid">
+            <div class="card">
+                <b>1. Escolha o plano</b>
+                <span>Toque em comprar, preencha o cadastro e me chame no Instagram @bruno_semiclchem.</span>
+            </div>
+            <div class="card">
+                <b>2. Pague</b>
+                <span>Pix ou outra forma combinada na conversa.</span>
+            </div>
+            <div class="card">
+                <b>3. Receba e jogue</b>
+                <span>Envio o material e te ajudo a configurar.</span>
+            </div>
+        </div>
+
+        <footer>
+            Resultados variam conforme o aparelho e o estilo de jogo.<br>
+            Site independente, sem vínculo com a Garena ou o Free Fire.
+        </footer>
+
     </div>
 
-    <h2 id="planos">Escolha seu plano</h2>
-    <div class="grid plans">
-      <div class="card">
-        <b>Sensi Básica</b>
-        <div class="price">R$ 4,50</div>
-        <ul>
-          <li>Sensi geral + miras</li>
-          <li>Passo a passo em imagens</li>
-        </ul>
-        <a class="btn" style="display:block;text-align:center" href="https://ig.me/m/bruno_semiclchem" target="_blank"
-          rel="noopener">Comprar</a>
-      </div>
-      <div class="card best">
-        <b>Sensi Completa ⭐</b>
-        <div class="price">R$ 10,50</div>
-        <ul>
-          <li>Tudo do plano básico</li>
-          <li>Layout de botões</li>
-          <li>Ajustes de desempenho</li>
-          <li>Suporte para dúvidas</li>
-        </ul>
-        <a class="btn" style="display:block;text-align:center" href="https://ig.me/m/bruno_semiclchem" target="_blank"
-          rel="noopener">Comprar</a>
-      </div>
+    <!-- TELA DE CADASTRO -->
+    <div class="overlay" id="cadastro" role="dialog" aria-modal="true" aria-labelledby="titulo-form">
+        <div class="box">
+
+            <button class="close" type="button" id="fechar" aria-label="Fechar">×</button>
+
+            <form id="form-clientes" action="">
+                <fieldset>
+                    <legend><b id="titulo-form">Formulário de Clientes</b></legend>
+
+                    <p class="plan-info">Plano escolhido: <b id="plano-escolhido"></b></p>
+                    <input type="hidden" name="plano" id="plano">
+                    <br>
+
+                    <div class="inputBox">
+                        <input type="text" name="nome" id="nome" class="inputUser" required>
+                        <label for="nome" class="LabelInput">Nome Completo</label>
+                    </div>
+                    <br><br>
+
+                    <div class="inputBox">
+                        <input type="email" name="email" id="email" class="inputUser" required>
+                        <label for="email" class="LabelInput">Email</label>
+                    </div>
+                    <br><br>
+
+                    <div class="inputBox">
+                        <input type="tel" name="telefone" id="telefone" class="inputUser" required>
+                        <label for="telefone" class="LabelInput">Telefone</label>
+                    </div>
+                    <br><br>
+
+                    <p>Sexo:</p>
+                    <div class="radios">
+                        <input type="radio" id="feminino" name="genero" value="feminino" required>
+                        <label for="feminino">Feminino</label>
+
+                        <input type="radio" id="masculino" name="genero" value="masculino" required>
+                        <label for="masculino">Masculino</label>
+
+                        <input type="radio" id="outro" name="genero" value="outro" required>
+                        <label for="outro">Outro</label>
+                    </div>
+                    <br><br>
+
+                    <div class="inputBox">
+                        <label for="data_nascimento"><b>Data de Nascimento</b></label>
+                        <input type="date" name="data_nascimento" id="data_nascimento" required>
+                    </div>
+                    <br><br>
+
+                    <div class="inputBox">
+                        <input type="text" name="cidade" id="cidade" class="inputUser" required>
+                        <label for="cidade" class="LabelInput">Cidade</label>
+                    </div>
+                    <br><br>
+
+                    <div class="inputBox">
+                        <input type="text" name="estado" id="estado" class="inputUser" required>
+                        <label for="estado" class="LabelInput">Estado</label>
+                    </div>
+                    <br><br>
+
+                    <div class="inputBox">
+                        <input type="text" name="endereco" id="endereco" class="inputUser" required>
+                        <label for="endereco" class="LabelInput">Endereço</label>
+                    </div>
+                    <br><br>
+
+                    <input type="submit" id="submit" name="submit" value="Enviar cadastro">
+                </fieldset>
+            </form>
+
+            <!-- Confirmação após o envio -->
+            <div class="done" id="confirmacao">
+                <h2 style="margin-top: 0;">Cadastro enviado! ✅</h2>
+                <p>Agora é só me chamar no Instagram para finalizar o pagamento e receber sua sensi.</p>
+                <a class="btn" href="https://ig.me/m/bruno_semiclchem" target="_blank" rel="noopener">
+                    Continuar no Instagram
+                </a>
+            </div>
+
+        </div>
     </div>
 
-    <h2>Como funciona</h2>
-    <div class="grid">
-      <div class="card"><b>1. Escolha o plano</b><span>Toque em comprar e me chame no Instagram
-          @bruno_semiclchem.</span></div>
-      <div class="card"><b>2. Pague</b><span>Pix ou outra forma combinada na conversa.</span></div>
-      <div class="card"><b>3. Receba e jogue</b><span>Envio o material e te ajudo a configurar.</span></div>
-    </div>
+    <script>
+        (function () {
+            var overlay = document.getElementById('cadastro');
+            var form = document.getElementById('form-clientes');
+            var done = document.getElementById('confirmacao');
 
-    <footer>
-      Resultados variam conforme o aparelho e o estilo de jogo.<br>
-      Site independente, sem vínculo com a Garena ou o Free Fire.
-    </footer>
-  </div>
+            function abrir(plano) {
+                document.getElementById('plano').value = plano;
+                document.getElementById('plano-escolhido').textContent = plano;
+
+                form.style.display = '';
+                done.style.display = 'none';
+
+                overlay.classList.add('open');
+                document.body.classList.add('lock');
+                overlay.scrollTop = 0;
+            }
+
+            function fechar() {
+                overlay.classList.remove('open');
+                document.body.classList.remove('lock');
+            }
+
+            document.querySelectorAll('[data-plano]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    abrir(btn.getAttribute('data-plano'));
+                });
+            });
+
+            document.getElementById('fechar').addEventListener('click', fechar);
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') fechar();
+            });
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                var dados = Object.fromEntries(new FormData(form).entries());
+                delete dados.submit;
+
+                // TODO: enviar "dados" para o seu servidor / Google Sheets / Formspree etc.
+                // Exemplo:
+                // fetch('SUA_URL', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify(dados)
+                // });
+                console.log('Cadastro:', dados);
+
+                form.style.display = 'none';
+                done.style.display = 'block';
+                form.reset();
+            });
+        })();
+    </script>
+
 </body>
 
 </html>
