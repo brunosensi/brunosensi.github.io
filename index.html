@@ -178,14 +178,15 @@
                     <div id="qr"></div>
                     <textarea class="code" id="copia-pix" readonly aria-label="Pix copia e cola"></textarea>
                     <button class="btn btn-block" type="button" id="copiar-pix">Copiar código Pix</button>
-                    <p class="steps">Pague pelo app do seu banco e depois toque no botão abaixo.</p>
-                    <button class="btn btn-block" type="button" id="ja-paguei">Já fiz o pagamento</button>
+                    <p class="steps">Código do pedido: <b id="cod-pedido"></b><br>Pague pelo app do seu banco e depois toque no botão abaixo.</p>
+                    <button class="btn btn-block" type="button" id="ja-paguei">Já paguei</button>
                 </div>
 
                 <div id="pago" style="display: none;">
-                    <h2 style="margin-top: 0;">Pagamento feito! ✅</h2>
-                    <p>Sua sensi vai chegar no e-mail <b id="email-cliente"></b> o mais rápido possível.</p>
+                    <h2 style="margin-top: 0;">Recebemos seu aviso! ⏳</h2>
+                    <p>Vamos conferir o seu pagamento. Quando for confirmado, sua sensi chega no e-mail <b id="email-cliente"></b> o mais rápido possível.</p>
                     <p>Não precisa enviar comprovante.</p>
+                    <p>Código do pedido: <b id="cod-final"></b></p>
                 </div>
             </div>
 
@@ -220,18 +221,18 @@
                 return ("000" + c.toString(16).toUpperCase()).slice(-4);
             }
 
-            function pixPayload(valor) {
+            function pixPayload(valor, txid) {
                 var conta = campo("00", "br.gov.bcb.pix") + campo("01", CHAVE_PIX);
                 var p = campo("00", "01") + campo("01", "11") + campo("26", conta) +
                     campo("52", "0000") + campo("53", "986") + campo("54", valor) +
                     campo("58", "BR") + campo("59", NOME_PIX.slice(0, 25)) +
-                    campo("60", CIDADE.slice(0, 15)) + campo("62", campo("05", "***")) + "6304";
+                    campo("60", CIDADE.slice(0, 15)) + campo("62", campo("05", txid)) + "6304";
                 return p + crc16(p);
             }
 
             function enviar(status) {
                 if (FORM_URL.indexOf('https://') !== 0) return;
-                var corpo = Object.assign({ status: status, _subject: 'Pedido de sensi: ' + status }, pedido.dados);
+                var corpo = Object.assign({ status: status, codigo_pedido: pedido.codigo, _subject: 'Pedido ' + pedido.codigo + ': ' + status }, pedido.dados);
                 fetch(FORM_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -239,8 +240,20 @@
                 }).catch(function () { });
             }
 
+            function gerarCodigo() {
+                var letras = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+                var buf = new Uint8Array(6);
+                crypto.getRandomValues(buf);
+                var s = '';
+                for (var i = 0; i < 6; i++) s += letras[buf[i] % letras.length];
+                return s;
+            }
+
             function mostrarPagamento() {
-                var code = pixPayload(pedido.valor);
+                pedido.codigo = gerarCodigo();
+                var code = pixPayload(pedido.valor, pedido.codigo);
+                document.getElementById('cod-pedido').textContent = pedido.codigo;
+                document.getElementById('ja-paguei').disabled = false;
                 var qr = document.getElementById('qr');
                 qr.innerHTML = '';
                 new QRCode(qr, { text: code, width: 220, height: 220, correctLevel: QRCode.CorrectLevel.M });
@@ -261,8 +274,10 @@
             });
 
             document.getElementById('ja-paguei').addEventListener('click', function () {
-                enviar('CLIENTE DISSE QUE PAGOU');
+                this.disabled = true;
+                enviar('AVISO DE PAGAMENTO - conferir no banco antes de enviar');
                 document.getElementById('email-cliente').textContent = pedido.email;
+                document.getElementById('cod-final').textContent = pedido.codigo;
                 document.getElementById('pix-box').style.display = 'none';
                 document.getElementById('pago').style.display = 'block';
                 overlay.scrollTop = 0;
@@ -305,13 +320,12 @@
                 delete dados.submit;
 
                 pedido.dados = dados;
-                enviar('cadastro feito, aguardando pagamento');
-                console.log('Cadastro:', dados);
 
                 pedido.plano = dados.plano;
                 pedido.nome = dados.nome;
                 pedido.email = dados.email;
                 mostrarPagamento();
+                enviar('cadastro feito, aguardando pagamento');
 
                 form.style.display = 'none';
                 done.style.display = 'block';
