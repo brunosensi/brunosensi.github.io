@@ -36,7 +36,7 @@
             </div>
             <div class="card">
                 <b>📩 Entrega rápida</b>
-                <span>Você recebe pelo Instagram com passo a passo.</span>
+                <span>Você recebe no seu e-mail com passo a passo.</span>
             </div>
         </div>
 
@@ -51,7 +51,7 @@
                     <li>Sensi geral + miras</li>
                     <li>Passo a passo em imagens</li>
                 </ul>
-                <button class="btn btn-block" type="button" data-plano="Sensi Básica (R$ 4,50)">
+                <button class="btn btn-block" type="button" data-plano="Sensi Básica (R$ 4,50)" data-valor="4.50">
                     Comprar
                 </button>
             </div>
@@ -65,7 +65,7 @@
                     <li>Ajustes de desempenho</li>
                     <li>Suporte para dúvidas</li>
                 </ul>
-                <button class="btn btn-block" type="button" data-plano="Sensi Completa (R$ 10,50)">
+                <button class="btn btn-block" type="button" data-plano="Sensi Completa (R$ 10,50)" data-valor="10.50">
                     Comprar
                 </button>
             </div>
@@ -77,15 +77,15 @@
         <div class="grid">
             <div class="card">
                 <b>1. Escolha o plano</b>
-                <span>Toque em comprar, preencha o cadastro e me chame no Instagram @bruno_semiclchem.</span>
+                <span>Toque em comprar e preencha o cadastro com seu e-mail.</span>
             </div>
             <div class="card">
                 <b>2. Pague</b>
-                <span>Pix ou outra forma combinada na conversa.</span>
+                <span>Pague com Pix pelo QR code ou pelo código.</span>
             </div>
             <div class="card">
                 <b>3. Receba e jogue</b>
-                <span>Envio o material e te ajudo a configurar.</span>
+                <span>Sua sensi chega no e-mail o mais rápido possível.</span>
             </div>
         </div>
 
@@ -169,23 +169,104 @@
                 </fieldset>
             </form>
 
-            <!-- Confirmação após o envio -->
+            <!-- Tela de pagamento (aparece após o cadastro) -->
             <div class="done" id="confirmacao">
-                <h2 style="margin-top: 0;">Cadastro enviado! ✅</h2>
-                <p>Agora é só me chamar no Instagram para finalizar o pagamento e receber sua sensi.</p>
-                <a class="btn" href="https://ig.me/m/bruno_semiclchem" target="_blank" rel="noopener">
-                    Continuar no Instagram
-                </a>
+                <div id="pix-box">
+                    <h2 style="margin-top: 0;">Pague com Pix</h2>
+                    <p id="resumo-pix"></p>
+                    <div class="total" id="total-pix"></div>
+                    <div id="qr"></div>
+                    <textarea class="code" id="copia-pix" readonly aria-label="Pix copia e cola"></textarea>
+                    <button class="btn btn-block" type="button" id="copiar-pix">Copiar código Pix</button>
+                    <p class="steps">Pague pelo app do seu banco e depois toque no botão abaixo.</p>
+                    <button class="btn btn-block" type="button" id="ja-paguei">Já fiz o pagamento</button>
+                </div>
+
+                <div id="pago" style="display: none;">
+                    <h2 style="margin-top: 0;">Pagamento feito! ✅</h2>
+                    <p>Sua sensi vai chegar no e-mail <b id="email-cliente"></b> o mais rápido possível.</p>
+                    <p>Não precisa enviar comprovante.</p>
+                </div>
             </div>
 
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
         (function () {
             var overlay = document.getElementById('cadastro');
             var form = document.getElementById('form-clientes');
             var done = document.getElementById('confirmacao');
+
+            // ===== CONFIGURAÇÃO DO PIX =====
+            var CHAVE_PIX = "4ab994eb-da31-4b1f-8fff-4e891d0d1f51";
+            var FORM_URL = "https://formspree.io/f/mppdpvqr"; // ex.: https://formspree.io/f/abcdwxyz
+            var NOME_PIX = "BRUNO SEMICLCHEM CARNEIRO"; // até 25 letras, sem acento
+            var CIDADE = "BRASIL";                       // troque pela sua cidade, sem acento
+            // ================================
+
+            var pedido = {};
+
+            function campo(id, v) { return id + ("0" + v.length).slice(-2) + v; }
+
+            function crc16(s) {
+                var c = 0xFFFF;
+                for (var i = 0; i < s.length; i++) {
+                    c ^= s.charCodeAt(i) << 8;
+                    for (var j = 0; j < 8; j++) c = (c & 0x8000) ? ((c << 1) ^ 0x1021) : (c << 1);
+                    c &= 0xFFFF;
+                }
+                return ("000" + c.toString(16).toUpperCase()).slice(-4);
+            }
+
+            function pixPayload(valor) {
+                var conta = campo("00", "br.gov.bcb.pix") + campo("01", CHAVE_PIX);
+                var p = campo("00", "01") + campo("01", "11") + campo("26", conta) +
+                    campo("52", "0000") + campo("53", "986") + campo("54", valor) +
+                    campo("58", "BR") + campo("59", NOME_PIX.slice(0, 25)) +
+                    campo("60", CIDADE.slice(0, 15)) + campo("62", campo("05", "***")) + "6304";
+                return p + crc16(p);
+            }
+
+            function enviar(status) {
+                if (FORM_URL.indexOf('https://') !== 0) return;
+                var corpo = Object.assign({ status: status, _subject: 'Pedido de sensi: ' + status }, pedido.dados);
+                fetch(FORM_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify(corpo)
+                }).catch(function () { });
+            }
+
+            function mostrarPagamento() {
+                var code = pixPayload(pedido.valor);
+                var qr = document.getElementById('qr');
+                qr.innerHTML = '';
+                new QRCode(qr, { text: code, width: 220, height: 220, correctLevel: QRCode.CorrectLevel.M });
+                document.getElementById('pix-box').style.display = '';
+                document.getElementById('pago').style.display = 'none';
+                document.getElementById('copia-pix').value = code;
+                document.getElementById('resumo-pix').textContent = pedido.plano;
+                document.getElementById('total-pix').textContent = 'R$ ' + pedido.valor.replace('.', ',');
+            }
+
+            document.getElementById('copiar-pix').addEventListener('click', function () {
+                var t = document.getElementById('copia-pix');
+                t.select();
+                try { navigator.clipboard.writeText(t.value); } catch (e) { document.execCommand('copy'); }
+                var b = this;
+                b.textContent = 'Código copiado!';
+                setTimeout(function () { b.textContent = 'Copiar código Pix'; }, 2000);
+            });
+
+            document.getElementById('ja-paguei').addEventListener('click', function () {
+                enviar('CLIENTE DISSE QUE PAGOU');
+                document.getElementById('email-cliente').textContent = pedido.email;
+                document.getElementById('pix-box').style.display = 'none';
+                document.getElementById('pago').style.display = 'block';
+                overlay.scrollTop = 0;
+            });
 
             function abrir(plano) {
                 document.getElementById('plano').value = plano;
@@ -206,6 +287,7 @@
 
             document.querySelectorAll('[data-plano]').forEach(function (btn) {
                 btn.addEventListener('click', function () {
+                    pedido.valor = btn.getAttribute('data-valor');
                     abrir(btn.getAttribute('data-plano'));
                 });
             });
@@ -222,17 +304,18 @@
                 var dados = Object.fromEntries(new FormData(form).entries());
                 delete dados.submit;
 
-                // TODO: enviar "dados" para o seu servidor / Google Sheets / Formspree etc.
-                // Exemplo:
-                // fetch('SUA_URL', {
-                //     method: 'POST',
-                //     headers: { 'Content-Type': 'application/json' },
-                //     body: JSON.stringify(dados)
-                // });
+                pedido.dados = dados;
+                enviar('cadastro feito, aguardando pagamento');
                 console.log('Cadastro:', dados);
+
+                pedido.plano = dados.plano;
+                pedido.nome = dados.nome;
+                pedido.email = dados.email;
+                mostrarPagamento();
 
                 form.style.display = 'none';
                 done.style.display = 'block';
+                overlay.scrollTop = 0;
                 form.reset();
             });
         })();
